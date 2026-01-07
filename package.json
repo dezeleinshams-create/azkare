@@ -1,0 +1,17 @@
+{
+  "name": "azkare",
+  "version": "1.0.0",
+  "description": "تطبيق أذكار الصباح والمساء - PWA",
+  "author": "",
+  "license": "MIT",
+  "scripts": {
+    "start": "npx http-server -c-1 . -p 8080",
+    "serve": "npm run start",
+    "cap:init": "npx cap init azkare com.example.azkare",
+    "cap:add-android": "npx cap add android",
+    "cap:sync": "npx cap sync",
+    "build": "echo 'Build step: use pwabuilder/capacitor or Android Studio as needed'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

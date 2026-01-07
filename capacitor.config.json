@@ -1,0 +1,6 @@
+{
+  "appId": "com.example.azkare",
+  "appName": "أذكار",
+  "webDir": ".",
+  "bundledWebRuntime": false
+}

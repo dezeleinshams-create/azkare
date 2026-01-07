@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أذكار الصباح والمساء - تطبيق احترافي 2026</title>
+    <link rel="stylesheet" href="style.css">
+        <!-- Google Analytics / GA4 placeholder: استبدل G-XXXXX بـ Measurement ID الخاص بك -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-XXXXXXX');
+        </script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3a6ea5">
+</head>
+<body>
+    <div id="fileOriginWarning" style="display:none;background:#fff3cd;border:1px solid #ffeeba;padding:10px;text-align:center;color:#856404">
+        التحذير: لقد فتحت التطبيق كملف محلي. لتفعيل بعض الميزات مثل Service Worker وPush والأذونات الأخرى، شغّل التطبيق عبر خادم محلي (مثلاً `npm run start`) وافتحه عبر http://localhost:8080
+    </div>
+    <div class="container">
+        <!-- الرأس الرئيسي -->
+        <header class="header">
+            <div class="header-content">
+                <h1>🌙 أذكار الصباح والمساء</h1>
+                <p class="subtitle">تطبيق احترافي للأذكار اليومية والأذان</p>
+                <div class="time-display" id="timeDisplay">الوقت: <span id="currentTime">--:--</span></div>
+            </div>
+        </header>
+
+        <!-- أوقات الصلاة -->
+        <div class="prayer-times-section">
+            <h2>🕌 أوقات الصلاة</h2>
+            <div class="prayer-times-grid" id="prayerTimes">
+                <div class="prayer-time-card">
+                    <div class="prayer-name">الفجر</div>
+                    <div class="prayer-time">--:--</div>
+                </div>
+                <div class="prayer-time-card">
+                    <div class="prayer-name">الشروق</div>
+                    <div class="prayer-time">--:--</div>
+                </div>
+                <div class="prayer-time-card">
+                    <div class="prayer-name">الظهر</div>
+                    <div class="prayer-time">--:--</div>
+                </div>
+                <div class="prayer-time-card">
+                    <div class="prayer-name">العصر</div>
+                    <div class="prayer-time">--:--</div>
+                </div>
+                <div class="prayer-time-card">
+                    <div class="prayer-name">المغرب</div>
+                    <div class="prayer-time">--:--</div>
+                </div>
+                <div class="prayer-time-card">
+                    <div class="prayer-name">العشاء</div>
+                    <div class="prayer-time">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- التحكم والإعدادات -->
+        <div class="controls-section">
+            <button class="control-btn" id="notificationBtn" onclick="enableNotifications()">
+                🔔 تفعيل الإشعارات
+            </button>
+            <button class="control-btn" id="playAdhhanBtn" onclick="playAdhhan()">
+                🎵 شغل الأذان
+            </button>
+            <button class="control-btn" id="settingsBtn" onclick="toggleSettings()">
+                ⚙️ الإعدادات
+            </button>
+            <button class="control-btn" id="shareBtn" onclick="shareApp()">
+                📤 مشاركة التطبيق
+            </button>
+            <button class="control-btn" id="payBtn" onclick="openPaymentsModal()">
+                💳 تبرع / ترقية
+            </button>
+        </div>
+
+        <!-- الإعدادات -->
+        <div class="settings-modal" id="settingsModal">
+            <div class="settings-content">
+                <h3>الإعدادات</h3>
+                <div class="setting-item">
+                    <label for="citySelect">اختر المدينة:</label>
+                    <select id="citySelect" onchange="changePrayerCity()">
+                        <option value="cairo">القاهرة - مصر</option>
+                        <option value="riyadh">الرياض - السعودية</option>
+                        <option value="dubai">دبي - الإمارات</option>
+                        <option value="amman">عمّان - الأردن</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="soundToggle" checked> تفعيل الأصوات
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="darkMode"> الوضع الليلي
+                    </label>
+                </div>
+                <button class="close-settings" onclick="toggleSettings()">إغلاق</button>
+            </div>
+        </div>
+
+        <!-- اعلان (مكان استبداله بإعلانات AdMob/AdSense عند التحزيم كـ Android أو عند الموافقة) -->
+        <div class="ad-banner" id="adBanner" aria-hidden="false" style="text-align:center;margin:12px 0;">
+            <div class="ad-placeholder">مكان الإعلان - استبداله بشيفرة AdMob داخل المشروع الأصلي بعد التحزيم</div>
+        </div>
+
+        <!-- التابات -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="morning">
+                🌅 أذكار الصباح
+            </button>
+            <button class="tab-btn" data-tab="evening">
+                🌆 أذكار المساء
+            </button>
+            <button class="tab-btn" data-tab="general">
+                ✨ أذكار عامة
+            </button>
+        </div>
+
+        <!-- المحتوى الرئيسي -->
+        <div class="content">
+            <!-- أذكار الصباح -->
+            <div class="tab-content active" id="morning">
+                <div class="adkaar-list">
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>1. الاستعاذة</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">أعوذ بالله من الشيطان الرجيم</p>
+                        <p class="translation">الاستعاذة من الشيطان الرجيم</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>2. البسملة</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">بسم الله الرحمن الرحيم</p>
+                        <p class="translation">الدعاء بقدرة الله ورحمته</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>3. دعاء الصباح</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم بك أصبحنا وبك أمسينا وبك نحيا وبك نموت وإليك النشور</p>
+                        <p class="translation">دعاء يومي لحفظ الله</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>4. الاستغفار</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">أستغفر الله العظيم الذي لا إله إلا هو الحي القيوم وأتوب إليه</p>
+                        <p class="translation">الاستغفار من الذنوب (3 مرات)</p>
+                        <div class="repeat-count"><span class="count">0</span>/3</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>5. سبحان الله وبحمده</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">سبحان الله وبحمده</p>
+                        <p class="translation">تسبيح وتحميد الله (100 مرة)</p>
+                        <div class="repeat-count"><span class="count">0</span>/100</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>6. دعاء الحفظ</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم حفظني بالإسلام قائماً وحفظني بالإسلام قاعداً وحفظني بالإسلام راقداً</p>
+                        <p class="translation">دعاء الحفظ والحماية</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>7. آية الكرسي</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">الله لا إله إلا هو الحي القيوم لا تأخذه سنة ولا نوم</p>
+                        <p class="translation">حفظك الله بآية الكرسي</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>8. دعاء الشفاء</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم أنت الشافي لا شفاء إلا شفاؤك، شفاء لا يغادر سقماً</p>
+                        <p class="translation">دعاء الشفاء من الأمراض</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>9. الصلاة على النبي</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم صلي وسلم على محمد وعلى آل محمد</p>
+                        <p class="translation">الصلاة والسلام على النبي ﷺ</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>10. دعاء الرزق</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم إني أسألك رزقاً حلالاً طيباً وأعوذ بك من الحرام</p>
+                        <p class="translation">دعاء الرزق الحلال</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أذكار المساء -->
+            <div class="tab-content" id="evening">
+                <div class="adkaar-list">
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>1. دعاء المساء</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم بك أمسينا وبك أصبحنا وبك نحيا وبك نموت وإليك المصير</p>
+                        <p class="translation">دعاء المساء</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>2. آية الكرسي</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">الله لا إله إلا هو الحي القيوم لا تأخذه سنة ولا نوم</p>
+                        <p class="translation">حفظك الله بآية الكرسي</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>3. سورة الإخلاص</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">قل هو الله أحد الله الصمد لم يلد ولم يولد ولم يكن له كفواً أحد</p>
+                        <p class="translation">توحيد خالص لله - سورة الإخلاص</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>4. استغفار المساء</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">أستغفر الله العظيم الذي لا إله إلا هو الحي القيوم وأتوب إليه</p>
+                        <p class="translation">الاستغفار من الذنوب (3 مرات)</p>
+                        <div class="repeat-count"><span class="count">0</span>/3</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>5. التسبيح والتحميد</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">سبحان الله وبحمده</p>
+                        <p class="translation">تسبيح وتحميد الله (100 مرة)</p>
+                        <div class="repeat-count"><span class="count">0</span>/100</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>6. دعاء الحفظ</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم حفظني بالإسلام قائماً وحفظني بالإسلام قاعداً وحفظني بالإسلام راقداً</p>
+                        <p class="translation">دعاء الحفظ والحماية</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>7. دعاء الجنة</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم إني أسألك الجنة وما قرب إليها من قول وعمل وأعوذ بك من النار</p>
+                        <p class="translation">دعاء طلب الجنة والاستعاذة من النار</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>8. دعاء التوبة</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم أنت ربي لا إله إلا أنت خلقتني وأنا عبدك وأنا على عهدك ووعدك</p>
+                        <p class="translation">دعاء التوبة والاستغفار</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>9. الصلاة على النبي</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم صلي وسلم على محمد وعلى آل محمد كما صليت على إبراهيم</p>
+                        <p class="translation">الصلاة والسلام على النبي ﷺ</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>10. الحوقلة</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">لا حول ولا قوة إلا بالله العلي العظيم</p>
+                        <p class="translation">استعانة بقوة الله (100 مرة)</p>
+                        <div class="repeat-count"><span class="count">0</span>/100</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أذكار عامة -->
+            <div class="tab-content" id="general">
+                <div class="adkaar-list">
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>دعاء الهداية</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم اهدنا الصراط المستقيم صراط الذين أنعمت عليهم</p>
+                        <p class="translation">دعاء الهداية والاستقامة</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>دعاء الصحة</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم إني أعوذ بك من البرص والجنون والجذام ومن سيء الأسقام</p>
+                        <p class="translation">الاستعاذة من الأمراض</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>دعاء الرزق</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم إني أسألك رزقاً حلالاً طيباً وأعوذ بك من الحرام والسحت</p>
+                        <p class="translation">دعاء الرزق الحلال</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>دعاء تيسير الأمور</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم لا تكلني إلى نفسي طرفة عين، ولا إلى أحد من خلقك</p>
+                        <p class="translation">دعاء عدم التكلية</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>تكبير وتهليل</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">لا إله إلا الله وحده لا شريك له له الملك وله الحمد</p>
+                        <p class="translation">تهليل وتكبير - ذكر عظيم (100 مرة)</p>
+                        <div class="repeat-count"><span class="count">0</span>/100</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>دعاء الحزن والهم</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم إني أعوذ بك من الهم والحزن والعجز والكسل والبخل والجبن</p>
+                        <p class="translation">دعاء من الهم والحزن والقلق</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>دعاء الأمان</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">اللهم إنا نسألك الأمن في أوطاننا وصلاح أئمتنا وولاة أمورنا</p>
+                        <p class="translation">دعاء الأمان والسلام</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>دعاء الاستيقاظ</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">الحمد لله الذي أحيانا بعد ما أماتنا وإليه النشور</p>
+                        <p class="translation">دعاء الاستيقاظ من النوم</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+
+                    <div class="adkar-card">
+                        <div class="card-header">
+                            <h3>دعاء النوم</h3>
+                            <div class="card-buttons">
+                                <button class="speak-btn" onclick="speakAzkar(this)">🔊</button>
+                                <button class="bookmark-btn" onclick="toggleBookmark(this)">🤍</button>
+                            </div>
+                        </div>
+                        <p class="arabic-text">باسمك الله وضعت جنبي وبك أرفعه فإن أمسكت نفسي فاغفر لها</p>
+                        <p class="translation">دعاء النوم والاستغفار</p>
+                        <div class="repeat-count"><span class="count">0</span>/1</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- قسم الأذكار المحفوظة -->
+        <div class="bookmarks-section">
+            <h2>📚 الأذكار المحفوظة</h2>
+            <div id="bookmarks-list" class="bookmarks-list">
+                <p class="empty-message">لا توجد أذكار محفوظة حالياً</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments Modal -->
+    <div id="paymentsModal" class="settings-modal" style="display:none;">
+        <div class="settings-content">
+            <h3>خيارات الدفع</h3>
+            <p>اختر طريقة الدفع لعمل تبرع أو ترقية التطبيق.</p>
+            <div style="display:flex;gap:8px;flex-direction:column;">
+                <button onclick="startStripeCheckout()" class="control-btn">الدفع عبر Stripe (بطاقة)</button>
+                <div id="paypal-button-container"></div>
+                <button onclick="startSubscription()" class="control-btn">اشتراك شهري (In-App Purchase)</button>
+            </div>
+            <button class="close-settings" onclick="closePaymentsModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <footer class="app-footer" style="text-align:center;padding:16px 8px;color:#666">
+        <div>حقوق التطبيق محفوظة © 2026</div>
+        <div style="margin-top:6px;"><a href="privacy-policy.html">سياسة الخصوصية</a></div>
+    </footer>
+</body>
+</html>
