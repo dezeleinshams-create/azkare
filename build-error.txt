@@ -1,0 +1,53 @@
+e: file:///C:/Users/Geforce/Desktop/azkare/android/app/build.gradle.kts:35:9: Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public open fun NamedDomainObjectContainer<ApplicationBuildType>.release(action: ApplicationBuildType.() -> Unit): Unit defined in com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+e: file:///C:/Users/Geforce/Desktop/azkare/android/app/build.gradle.kts:37:13: Unresolved reference: storeFile
+e: file:///C:/Users/Geforce/Desktop/azkare/android/app/build.gradle.kts:38:13: Unresolved reference: storePassword
+e: file:///C:/Users/Geforce/Desktop/azkare/android/app/build.gradle.kts:39:13: Unresolved reference: keyAlias
+e: file:///C:/Users/Geforce/Desktop/azkare/android/app/build.gradle.kts:40:13: Unresolved reference: keyPassword
+e: file:///C:/Users/Geforce/Desktop/azkare/android/app/build.gradle.kts:47:44: Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public val NamedDomainObjectContainer<KotlinSourceSet>.release: NamedDomainObjectProvider<KotlinSourceSet> defined in org.gradle.kotlin.dsl
+e: file:///C:/Users/Geforce/Desktop/azkare/android/app/build.gradle.kts:52:44: Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+public val NamedDomainObjectContainer<KotlinSourceSet>.debug: NamedDomainObjectProvider<KotlinSourceSet> defined in org.gradle.kotlin.dsl
+
+FAILURE: Build failed with an exception.
+
+* Where:
+Build file 'C:\Users\Geforce\Desktop\azkare\android\app\build.gradle.kts' line: 35
+
+* What went wrong:
+Script compilation errors:
+
+  Line 35:         release {
+                   ^ Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+                       public open fun NamedDomainObjectContainer<ApplicationBuildType>.release(action: ApplicationBuildType.() -> Unit): Unit defined in com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+
+  Line 37:             storeFile = file("release-keystore.jks")
+                       ^ Unresolved reference: storeFile
+
+  Line 38:             storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "android"
+                       ^ Unresolved reference: storePassword
+
+  Line 39:             keyAlias = System.getenv("KEY_ALIAS") ?: "azkare"
+                       ^ Unresolved reference: keyAlias
+
+  Line 40:             keyPassword = System.getenv("KEY_PASSWORD") ?: "android"
+                       ^ Unresolved reference: keyPassword
+
+  Line 47:             signingConfig = signingConfigs.release
+                                                      ^ Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+                                                          public val NamedDomainObjectContainer<KotlinSourceSet>.release: NamedDomainObjectProvider<KotlinSourceSet> defined in org.gradle.kotlin.dsl
+
+  Line 52:             signingConfig = signingConfigs.debug
+                                                      ^ Unresolved reference. None of the following candidates is applicable because of receiver type mismatch: 
+                                                          public val NamedDomainObjectContainer<KotlinSourceSet>.debug: NamedDomainObjectProvider<KotlinSourceSet> defined in org.gradle.kotlin.dsl
+
+7 errors
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 1m 19s
+Gradle task assembleRelease failed with exit code 1
